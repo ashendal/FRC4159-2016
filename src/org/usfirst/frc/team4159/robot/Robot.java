@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 
-	public static OI oi;
+    public static OI oi;
 
     Command autonomousCommand;
     SendableChooser chooser;
@@ -22,41 +22,42 @@ public class Robot extends IterativeRobot {
      * Main robot initialization method
      */
     public void robotInit() {
-		oi = new OI();
+        oi = new OI();
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", null);
-//        chooser.addObject("My Auto", new MyAutoCommand());
+        // chooser.addObject("My Auto", new MyAutoCommand());
         SmartDashboard.putData("Auto mode", chooser);
     }
-	
-	/**
+
+    /**
      * Robot disable method
      * 
      * Used to reset subsystems and values
      */
-    public void disabledInit(){
+    public void disabledInit() {
 
     }
-	
-    /**
-	 * Disabled periodic function
-	 * 
-	 * Nothing should run here...
-	 */
-	public void disabledPeriodic() {
-		Scheduler.getInstance().run();
-	}
 
-	/**
-	 * Autonomous initialization function
-	 * 
-	 * Read autonomous mode from SmartDashboard and run that command
-	 */
+    /**
+     * Disabled periodic function
+     * 
+     * Nothing should run here...
+     */
+    public void disabledPeriodic() {
+        Scheduler.getInstance().run();
+    }
+
+    /**
+     * Autonomous initialization function
+     * 
+     * Read autonomous mode from SmartDashboard and run that command
+     */
     public void autonomousInit() {
         autonomousCommand = (Command) chooser.getSelected();
-    	
-    	// schedule the autonomous command (example)
-        if (autonomousCommand != null) autonomousCommand.start();
+
+        // schedule the autonomous command (example)
+        if (autonomousCommand != null)
+            autonomousCommand.start();
     }
 
     /**
@@ -65,15 +66,16 @@ public class Robot extends IterativeRobot {
     public void autonomousPeriodic() {
         Scheduler.getInstance().run();
     }
-    
+
     /**
-	 * Teleop initialization function
-	 * 
-	 * Kill autonomous command and setup any subsystems for teleop mode
-	 */
+     * Teleop initialization function
+     * 
+     * Kill autonomous command and setup any subsystems for teleop mode
+     */
     public void teleopInit() {
-    	// kill autonomous command at start of teleop
-        if (autonomousCommand != null) autonomousCommand.cancel();
+        // kill autonomous command at start of teleop
+        if (autonomousCommand != null)
+            autonomousCommand.cancel();
     }
 
     /**
@@ -84,16 +86,16 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
     }
-    
+
     /**
      * Test initialization method
      * 
      * Setup subsystems and SmartDashboard for testing
      */
     public void testInit() {
-        
+
     }
-    
+
     /**
      * Test periodic method
      * 
