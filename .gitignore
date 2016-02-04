@@ -19,8 +19,6 @@ build/
 dist/
 
 #WPILib stuff
-build.properties
-build.xml
 sysProps.xml
 
 # Eclipse Core
