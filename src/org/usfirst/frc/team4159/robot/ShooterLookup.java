@@ -14,7 +14,7 @@ public class ShooterLookup {
      * @param x the number to be rounded
      * @return input rounded to the nearest 5
      */
-    int getRoundDist(double x){
+    private int getRoundDist(double x){
         int out = x;
         if( out%10 < 5 ){
             if(out%5 < 3)
