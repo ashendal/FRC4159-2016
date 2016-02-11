@@ -17,6 +17,7 @@ public class Robot extends IterativeRobot {
 
     Command autonomousCommand;
     SendableChooser chooser;
+    ShooterLookup aiming;
 
     /**
      * Main robot initialization method
@@ -24,6 +25,7 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
         oi = new OI();
         chooser = new SendableChooser();
+        aiming = new ShooterLookup();
         chooser.addDefault("Default Auto", null);
         // chooser.addObject("My Auto", new MyAutoCommand());
         SmartDashboard.putData("Auto mode", chooser);
