@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4159.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.Victor;
@@ -16,11 +18,23 @@ public class Drivetrain extends Subsystem {
     private PIDController leftPID;
     private PIDController rightPID;
     
-    public Drivetrain(int leftMotorPort, int rightMotorPort, int leftEncoderPortA, int leftEncoderPortB, int rightEncoderPortA, int rightEncoderPortB, EncoderType leftEncoderType, EncoderType rightEncoderType)
+    private DoubleSolenoid leftSolenoid;
+    private DoubleSolenoid rightSolenoid;
+    
+    private SpeedGear currentGear;
+    
+    private static final double maxLowGearSpeed = 0; //TODO: Set real speeds 
+    private static final double maxHighGearSpeed = 0;
+    
+    public Drivetrain(int leftMotorPort, int rightMotorPort, int leftSolenoidPortA, int leftSolenoidPortB, int rightSolenoidPortA, int rightSolenoidPortB, int leftEncoderPortA, int leftEncoderPortB, int rightEncoderPortA, int rightEncoderPortB, EncoderType leftEncoderType, EncoderType rightEncoderType)
     {
         // Setup motors with given port numbers
         leftMotor = new Victor(leftMotorPort);
         rightMotor =  new Victor(rightMotorPort);
+        
+        // Setup Solenoids
+        leftSolenoid = new DoubleSolenoid(leftSolenoidPortA, leftSolenoidPortB);
+        rightSolenoid = new DoubleSolenoid(rightSolenoidPortA, rightSolenoidPortB);
         
         // Setup encoders given ports
         leftEncoder = new Encoder(leftEncoderPortA, leftEncoderPortB);
@@ -33,6 +47,9 @@ public class Drivetrain extends Subsystem {
         // Setup PID
         leftPID = new PIDController(SmartDashboard.getNumber("Drivetrain.leftPID.kP"), SmartDashboard.getNumber("Drivetrain.leftPID.kI"), SmartDashboard.getNumber("Drivetrain.leftPID.kD"), SmartDashboard.getNumber("Drivetrain.leftPID.kF"), leftEncoder, leftMotor);
         rightPID = new PIDController(SmartDashboard.getNumber("Drivetrain.rightPID.kP"), SmartDashboard.getNumber("Drivetrain.rightPID.kI"), SmartDashboard.getNumber("Drivetrain.rightPID.kD"), SmartDashboard.getNumber("Drivetrain.rightPID.kF"), rightEncoder, rightMotor);
+    
+        // Set current gear
+        setGear(SpeedGear.LOW);
     }
     
     public void enable()
@@ -53,9 +70,32 @@ public class Drivetrain extends Subsystem {
         rightPID.setSetpoint(rightValue);
     }
     
+    public void setGear(SpeedGear gear)
+    {
+        currentGear = gear;
+        switch(gear)
+        {
+        case HIGH:
+            leftSolenoid.set(Value.kForward);
+            rightSolenoid.set(Value.kForward);
+            break;
+        case LOW:
+            leftSolenoid.set(Value.kReverse);
+            rightSolenoid.set(Value.kReverse);
+        }
+    }
+    
+    public SpeedGear getGear()
+    {
+        return currentGear;
+    }
+    
+    
     protected void initDefaultCommand() {
         
     }
+    
+    enum SpeedGear { LOW, HIGH }
 
     enum EncoderType {
         S4

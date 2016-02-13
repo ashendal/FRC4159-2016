@@ -14,6 +14,12 @@ public class RobotMap {
     public static int rightDriveMotor1 = 0;
     public static int rightDriveMotor2 = 0;
     
+    //Drivetrain encoder ports:
+    public static int leftDriveEncoderA = 0;
+    public static int leftDriveEncoderB = 0;
+    public static int rightDriveEncoderA = 0;
+    public static int rightDriveEncoderB = 0;
+    
     // Drivetrain solenoid ports:
     public static int leftShiftPiston = 0;
     public static int rightShiftPiston = 0;
