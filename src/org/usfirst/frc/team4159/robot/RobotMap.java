@@ -9,10 +9,8 @@ package org.usfirst.frc.team4159.robot;
 public class RobotMap {
     
     // Drivetrain PWM ports:
-    public static int leftDriveMotor1 = 0;
-    public static int leftDriveMotor2 = 0;
-    public static int rightDriveMotor1 = 0;
-    public static int rightDriveMotor2 = 0;
+    public static int leftDriveMotor = 0;
+    public static int rightDriveMotor = 0;
     
     //Drivetrain encoder ports:
     public static int leftDriveEncoderA = 0;
@@ -21,9 +19,10 @@ public class RobotMap {
     public static int rightDriveEncoderB = 0;
     
     // Drivetrain solenoid ports:
-    public static int leftShiftPiston = 0;
-    public static int rightShiftPiston = 0;
-    
+    public static int leftShiftPistonForwards = 0;
+    public static int leftShiftPistonReverse = 0;
+    public static int rightShiftPistonForwards = 0;
+    public static int rightShiftPistonReverse = 0;
     
     // Shooter PWM ports:
     public static int shooter1 = 0;
