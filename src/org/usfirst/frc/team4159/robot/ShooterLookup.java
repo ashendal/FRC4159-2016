@@ -1,3 +1,6 @@
+package org.usfirst.frc.team4159.robot;
+ 
+import java.util.ArrayList;
 /**
  * Lookup table of values for shooter aiming
  * 
@@ -6,8 +9,11 @@
 public class ShooterLookup {
     // ArrayList contains array pairs of {Distance, Angle}
     // CURRENTLY CONTAINS RANDOM VALUES! DELETE THIS WHEN ARRAYLIST IS POPUlATED
-    static ArrayList<int[2]> lookupTable = new ArrayList<>({5,40},{10,45}, {15,36}); 
-    public ShooterLookup(){};
+    static ArrayList<Pair> lookupTable = new ArrayList<Pair>();
+    public ShooterLookup(){
+        for(int i = 0; i < 90; i += 5)
+            lookupTable.add(new Pair(i, (i+30)));
+    }
     
     /**
      * Rounds input
@@ -15,7 +21,7 @@ public class ShooterLookup {
      * @return input rounded to the nearest 5
      */
     private int getRoundDist(double x){
-        int out = x;
+        int out = (int)x;
         if( out%10 < 5 ){
             if(out%5 < 3)
                 out = out - (out%5);
@@ -38,8 +44,8 @@ public class ShooterLookup {
     public int getAngle(double dist){
         int rDist = getRoundDist(dist);
         for(int i = 0; i < lookupTable.size(); i++){
-             if(lookupTable.get(i)[0] == rDist)
-                 return lookupTable.get(i)[1];
+             if(lookupTable.get(i).distance == rDist)
+                 return lookupTable.get(i).angle;
         }
         return -1;
     }
