@@ -3,12 +3,15 @@ package org.usfirst.frc.team4159.robot.subsystems;
 import org.usfirst.frc.team4159.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class Shooter extends Subsystem {
 
+    private static int TARGET_SPEED = 5000;
+    
     private Victor topWheelMotor;
     private Victor bottomWheelMotor;
     
@@ -31,11 +34,55 @@ public class Shooter extends Subsystem {
         triggerActuator = new DoubleSolenoid(RobotMap.shooterTriggerForwards, RobotMap.shooterTriggerReverse);
     }
     
+    public boolean atTargetSpeed()
+    {
+        return getTopWheelSpeed() >= TARGET_SPEED && getBottomWheelSpeed() >= TARGET_SPEED;
+    }
+    
+    public double getTopWheelSpeed()
+    {
+        return topWheelEncoder.get();
+    }
+    
+    public double getBottomWheelSpeed()
+    {
+        return bottomWheelEncoder.get();
+    }
+    
+    public void setTopWheel(double value)
+    {
+        topWheelMotor.set(value);
+    }
+    
+    public void setBottomWheel(double value)
+    {
+        bottomWheelMotor.set(value);
+    }
+    
+    public void setWheels(double leftValue, double rightValue)
+    {
+        topWheelMotor.set(leftValue);
+        bottomWheelMotor.set(rightValue);
+    }
+    
+    public void setTrigger(TriggerPosition pos)
+    {
+        switch(pos)
+        {
+        case OPEN:
+            triggerActuator.set(Value.kReverse);
+            break;
+        case CLOSED:
+            triggerActuator.set(Value.kReverse);
+            break;
+        }
+    }
+    
     protected void initDefaultCommand() {
         
     }
     
-    private enum TriggerPositions {
-        
+    private enum TriggerPosition {
+        OPEN, CLOSED
     }
 }
