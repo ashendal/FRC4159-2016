@@ -5,6 +5,7 @@ import org.usfirst.frc.team4159.robot.RobotMap;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -95,6 +96,18 @@ public class Drivetrain extends Subsystem {
     {
         leftPID.setSetpoint(leftValue);
         rightPID.setSetpoint(rightValue);
+    }
+    
+    /**
+     * Set motor values from joysticks
+     * 
+     * @param leftStick  Left joystick
+     * @param rightStick Right joystick
+     */
+    public void set(Joystick leftStick, Joystick rightStick)
+    {
+        leftPID.setSetpoint(leftStick.getY());
+        rightPID.setSetpoint(rightStick.getY());
     }
     
     /**
