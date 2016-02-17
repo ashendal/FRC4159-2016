@@ -28,4 +28,6 @@ public class RobotMap {
     public static int shooter1 = 0;
     public static int shooter2 = 0;
     public static int dartActuator = 0;
+    public static int dartEncoderA = 0;
+    public static int dartEncoderB = 0;
 }
