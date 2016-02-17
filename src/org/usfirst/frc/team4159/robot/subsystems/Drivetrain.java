@@ -11,6 +11,11 @@ import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * Drivetrain subsystem
+ * 
+ * @author Cole Scott
+ */
 public class Drivetrain extends Subsystem {
 
     private Victor leftMotor;
@@ -29,6 +34,12 @@ public class Drivetrain extends Subsystem {
     private static final double maxLowGearSpeed = 0; //TODO: Set real speeds 
     private static final double maxHighGearSpeed = 0; //TODO: Figure out what the hell this is for
     
+    /**
+     * Main drivetrain constructor<br>
+     * <br>
+     * Initializes all motors, solenoids, and PID controllers<br>
+     * PID values read from SmartDashboard<br>
+     */
     public Drivetrain()
     {
         // Setup motors with given port numbers
@@ -55,30 +66,55 @@ public class Drivetrain extends Subsystem {
         setGear(SpeedGear.LOW);
     }
     
+    /**
+     * Enable subsystem<br>
+     * To be called in teleopInit and autonomousInit in Robot class<br>
+     */
     public void enable()
     {
         leftPID.enable();
         rightPID.enable();
     }
     
+    /**
+     * Enable subsystem and reset PID components<br>
+     * To be called in disabledInit in Robot class<br>
+     */
     public void disable()
     {
-        leftPID.disable();
-        rightPID.disable();
+        leftPID.reset();
+        rightPID.reset();
     }
     
+    /**
+     * Set motor values<br>
+     * 
+     * @param leftValue  Left motor setpoint. In RPS (revolutions / sec)
+     * @param rightValue Right motor setpoint. In RPS (revolutions / sec)
+     */
     public void set(double leftValue, double rightValue)
     {
         leftPID.setSetpoint(leftValue);
         rightPID.setSetpoint(rightValue);
     }
     
+    /**
+     * Set motor values from joysticks
+     * 
+     * @param leftStick  Left joystick
+     * @param rightStick Right joystick
+     */
     public void set(Joystick leftStick, Joystick rightStick)
     {
         leftPID.setSetpoint(leftStick.getY());
         rightPID.setSetpoint(rightStick.getY());
     }
     
+    /**
+     * Set current gear to low or high gear<br>
+     * 
+     * @param gear New gear value, LOW or HIGH
+     */
     public void setGear(SpeedGear gear)
     {
         currentGear = gear;
@@ -94,21 +130,49 @@ public class Drivetrain extends Subsystem {
         }
     }
     
+    /**
+     * Get current gear setting<br>
+     * Not guaranteed to be finished shifting to gear yet.<br>
+     * 
+     * @return Current gear
+     */
     public SpeedGear getGear()
     {
         return currentGear;
     }
     
-    
+    /**
+     * Sets up default command<br>
+     * <br>
+     * Currently unused<br>
+     */
     protected void initDefaultCommand() {
         
     }
     
+    /**
+     * Gear settings<br>
+     * HIGH and LOW values<br>
+     * <br>
+     * Used to get and set current gear<br>
+     */
     enum SpeedGear { LOW, HIGH }
 
+    /**
+     * Encoder types<br>
+     * <br>
+     * Used for constants for encoder settings<br>
+     */
     enum EncoderType {
         S4
     }
+    
+    /**
+     * Get revolutions per pulse given encoder type used
+     * 
+     * @param encoderType Encoder being used to calculate rate
+     * @return revolutions per pulse of encoder
+     */
     private double getRevolutionsPerPulse(EncoderType encoderType)
     {
         switch(encoderType)
