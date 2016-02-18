@@ -2,7 +2,7 @@ package org.usfirst.frc.team4159.robot.subsystems;
 
 import org.usfirst.frc.team4159.robot.RobotMap;
 
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.Victor;
@@ -20,10 +20,8 @@ public class Lifter extends Subsystem {
     
     private Victor lifterDart;
     
-    private Encoder lifterEncoder;
-    
-    private PIDController lifterPID;
-    
+    private AnalogInput lifterEncoder;
+        
     /**
      * Main Lifter constructor<br>
      * <br>
@@ -32,44 +30,13 @@ public class Lifter extends Subsystem {
     public Lifter()
     {
         lifterDart = new Victor(RobotMap.dartActuator);
-        lifterEncoder = new Encoder(RobotMap.dartEncoderA, RobotMap.dartEncoderB);
-        lifterPID = new PIDController(SmartDashboard.getNumber("Lifter.lifterPID.kP"), SmartDashboard.getNumber("Lifter.lifterPID.kI"), SmartDashboard.getNumber("Lifter.lifterPID.kD"), lifterEncoder, lifterDart);
+        lifterDart.setInverted(true);
+        lifterEncoder = new AnalogInput(RobotMap.dartEncoder);
     }
     
-    /**
-     * Enable subsystem
-     */
-    public void enable()
+    public void setRaw(double raw)
     {
-        lifterPID.enable();
-    }
-    
-    /**
-     * Disable subsystem
-     */
-    public void disable()
-    {
-        lifterPID.disable();
-    }
-    
-    /**
-     * Feed joystick value to use to move lifter
-     * 
-     * @param joystick Joystick for input
-     */
-    public void feedJoystick(Joystick joystick)
-    {
-        setAngle(getAngle() + (joystick.getY() * JOYSTICK_MULT));
-    }
-    
-    /**
-     * Set angle of lifter
-     * 
-     * @param angle Angle setpoint
-     */
-    public void setAngle(double angle)
-    {
-        lifterPID.setSetpoint(getValueFromAngle(angle));
+        lifterDart.set(raw);
     }
     
     /**
@@ -79,7 +46,8 @@ public class Lifter extends Subsystem {
      */
     public double getAngle()
     {
-        return getAngleFromValue(lifterEncoder.get());
+        SmartDashboard.putNumber("lifterPID value", lifterEncoder.getValue());
+        return getAngleFromValue(lifterEncoder.getValue());
     }
     
     public void initDefaultCommand() {

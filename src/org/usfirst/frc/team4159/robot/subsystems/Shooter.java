@@ -82,7 +82,7 @@ public class Shooter extends Subsystem {
         
     }
     
-    private enum TriggerPosition {
+    public enum TriggerPosition {
         OPEN, CLOSED
     }
 }

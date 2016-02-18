@@ -156,7 +156,7 @@ public class Drivetrain extends Subsystem {
      * <br>
      * Used to get and set current gear<br>
      */
-    enum SpeedGear { LOW, HIGH }
+    public enum SpeedGear { LOW, HIGH }
 
     /**
      * Encoder types<br>
