@@ -19,6 +19,6 @@ public class ShooterLookup {
      * @return the angle to shoot at
      */
     public double getAngle(double dist){
-        return 1.862*(dist/12.0) + 34.79;
+        return 1.862*(dist/12.0) /*converts dist to feet*/ + 34.79;
     }
 }
