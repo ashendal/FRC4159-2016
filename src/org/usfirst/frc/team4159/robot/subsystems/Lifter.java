@@ -47,6 +47,7 @@ public class Lifter extends Subsystem {
     public double getAngle()
     {
         SmartDashboard.putNumber("lifterPID value", lifterEncoder.getValue());
+        SmartDashboard.putNumber("lifter angle", getAngleFromValue(lifterEncoder.getValue()));
         return getAngleFromValue(lifterEncoder.getValue());
     }
     
