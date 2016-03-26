@@ -13,7 +13,8 @@ public class ShooterLookup {
      * @param dist the distance, in inches, provided by the camera
      * @return the angle to shoot at
      */
-    public static double getAngle(double dist){
-        return 1.862*(dist/12.0) + 34.79;
+    public double getAngle(double distanceInInches){
+        double feet = distanceInInches / 12.0;
+        return 1.862 * feet + 34.79;
     }
 }
