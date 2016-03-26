@@ -36,6 +36,7 @@ public class AutoAim extends Command {
     protected void initialize() {
         time.reset();
         time.start();
+        setShooterAngle.setAngle(Robot.lifter.getAngle());
         setShooterAngle.start();
         SmartDashboard.putBoolean("runningAutoAim", true);
     }

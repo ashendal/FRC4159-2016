@@ -63,7 +63,11 @@ public class Robot extends IterativeRobot {
         autoAim = new AutoAim();
 
         chooser = new SendableChooser();
-        chooser.addDefault("Default Auto", new AutoCommand());
+        chooser.addDefault("Low Bar", new AutoCommand(AutoCommand.Defense.LOW_BAR));
+        chooser.addDefault("Second", new AutoCommand(AutoCommand.Defense.SECOND));
+        chooser.addDefault("Third", new AutoCommand(AutoCommand.Defense.THIRD));
+        chooser.addDefault("Fourth", new AutoCommand(AutoCommand.Defense.FOURTH));
+        chooser.addDefault("Fifth", new AutoCommand(AutoCommand.Defense.FIFTH));
         SmartDashboard.putData("Auto mode", chooser);
 
         try {
