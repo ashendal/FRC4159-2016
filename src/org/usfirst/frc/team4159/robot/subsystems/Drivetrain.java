@@ -64,6 +64,9 @@ public class Drivetrain extends Subsystem {
     
         // Set current gear
         setGear(SpeedGear.LOW);
+        
+        // Set inversion of motors
+        rightMotor.setInverted(true);
     }
     
     /**

@@ -30,7 +30,6 @@ public class Lifter extends Subsystem {
     public Lifter()
     {
         lifterDart = new Victor(RobotMap.dartActuator);
-        lifterDart.setInverted(true);
         lifterEncoder = new AnalogInput(RobotMap.dartEncoder);
     }
     
@@ -46,7 +45,7 @@ public class Lifter extends Subsystem {
      */
     public double getAngle()
     {
-        SmartDashboard.putNumber("lifterPID value", lifterEncoder.getValue());
+        SmartDashboard.putNumber("lifter value", lifterEncoder.getValue());
         return getAngleFromValue(lifterEncoder.getValue());
     }
     
@@ -63,7 +62,7 @@ public class Lifter extends Subsystem {
      */
     private double getValueFromAngle(double degrees)
     {
-        return 2965 + (-11.33 * -1 *degrees);
+        return 2896 + (9.052 *degrees);
     }
     
     /**
@@ -76,7 +75,7 @@ public class Lifter extends Subsystem {
      */
     private double getAngleFromValue(double value)
     {
-        return -1*(261.6 + (-0.08824 * value));
+        return (-316.3 + (0.1094 * value));
 
     }
 }

@@ -16,26 +16,34 @@ public class Shoot extends Command {
     
     public Shoot() {
         requires(Robot.shooter);
-        SmartDashboard.putBoolean("Running Shoot", true);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+        Robot.drivetrain.set(0, 0);
+        Robot.lifter.setRaw(0);
+        
         Robot.shooter.setTrigger(TriggerPosition.OPEN);
+        
+        Timer.delay(0.2);
+        Robot.shooter.setWheels(0.75, 0.75);
+        Timer.delay(2);
+        Robot.shooter.setTrigger(TriggerPosition.CLOSED);
+        Timer.delay(0.5);
+        Robot.shooter.setWheels(0.0, 0.0);
+        doneShooting = true;
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        Robot.shooter.setWheels(1.0, 1.0);
         
-        Timer.delay(0.5);
         //if(Robot.shooter.atTargetSpeed())
         //{
-            Timer.delay(0.5);
-            Robot.shooter.setTrigger(TriggerPosition.CLOSED);
-            Timer.delay(0.5);
-            Robot.shooter.setWheels(0.0, 0.0);
-            doneShooting = true;
+        //    Timer.delay(0.5);
+        //    Robot.shooter.setTrigger(TriggerPosition.CLOSED);
+        //    Timer.delay(0.5);
+        //    Robot.shooter.setWheels(0.0, 0.0);
+        //    doneShooting = true;
         //} else {
         //    Robot.shooter.setWheels(1.0, 1.0);
         //}
@@ -48,7 +56,6 @@ public class Shoot extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-        SmartDashboard.putBoolean("Running Shoot", true);
     }
 
     // Called when another command which requires one or more of the same

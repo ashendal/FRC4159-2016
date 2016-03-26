@@ -41,12 +41,12 @@ public class Shooter extends Subsystem {
     
     public double getTopWheelSpeed()
     {
-        return topWheelEncoder.get();
+        return topWheelEncoder.getRate();
     }
     
     public double getBottomWheelSpeed()
     {
-        return bottomWheelEncoder.get();
+        return bottomWheelEncoder.getRate();
     }
     
     public void setTopWheel(double value)
@@ -73,7 +73,7 @@ public class Shooter extends Subsystem {
             triggerActuator.set(Value.kReverse);
             break;
         case CLOSED:
-            triggerActuator.set(Value.kReverse);
+            triggerActuator.set(Value.kForward);
             break;
         }
     }
