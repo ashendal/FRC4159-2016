@@ -70,12 +70,12 @@ public class Robot extends IterativeRobot {
         
         SmartDashboard.putNumber("Lifter.lifterPID.kP", 0.1);
         
-        SmartDashboard.putNumber("Drivetrain.leftPID.kP", 0.1);
+        SmartDashboard.putNumber("Drivetrain.leftPID.kP", 0.05);
         SmartDashboard.putNumber("Drivetrain.leftPID.kI", 0);
         SmartDashboard.putNumber("Drivetrain.leftPID.kD", 0);
         SmartDashboard.putNumber("Drivetrain.leftPID.kF", 0);
         
-        SmartDashboard.putNumber("Drivetrain.rightPID.kP", 0.1);
+        SmartDashboard.putNumber("Drivetrain.rightPID.kP", 0.05);
         SmartDashboard.putNumber("Drivetrain.rightPID.kI", 0);
         SmartDashboard.putNumber("Drivetrain.rightPID.kD", 0);
         SmartDashboard.putNumber("Drivetrain.rightPID.kF", 0);
