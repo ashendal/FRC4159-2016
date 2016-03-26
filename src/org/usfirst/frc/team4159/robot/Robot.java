@@ -11,7 +11,11 @@ import org.usfirst.frc.team4159.robot.subsystems.Lifter;
 import org.usfirst.frc.team4159.robot.subsystems.Shooter;
 import org.usfirst.frc.team4159.robot.subsystems.Shooter.TriggerPosition;
 
+import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -29,14 +33,16 @@ public class Robot extends IterativeRobot {
     public static Lifter lifter;
     public static Drivetrain drivetrain;
 
-    Command autonomousCommand;
-    SendableChooser chooser;
+    private Command autonomousCommand;
+    private SendableChooser chooser;
 
     public static TowerTracker towerTracker;
 
-    Command shoot;
-    SetShooterAngle setLifterAngle;
-    AutoAim autoAim;
+    private Command shoot;
+    private SetShooterAngle setLifterAngle;
+    private AutoAim autoAim;
+
+    private AHRS ahrs;
 
     /**
      * Main robot initialization method
@@ -59,6 +65,12 @@ public class Robot extends IterativeRobot {
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", new AutoCommand());
         SmartDashboard.putData("Auto mode", chooser);
+
+        try {
+            ahrs = new AHRS(SPI.Port.kMXP);
+        } catch (RuntimeException ex) {
+            DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
+        }
     }
 
     private void setupSmartDashboard() {

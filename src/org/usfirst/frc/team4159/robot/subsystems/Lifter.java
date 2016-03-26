@@ -55,7 +55,9 @@ public class Lifter extends Subsystem {
      * @return Encoder value output
      */
     private double getValueFromAngle(double degrees) {
-        return 2896 + (9.052 * degrees);
+        double magicA = 2896;
+        double magicB = 9.052;
+        return magicA + (9.052 * degrees);
     }
 
     /**

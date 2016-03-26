@@ -2,6 +2,7 @@ package org.usfirst.frc.team4159.robot.commands;
 
 import org.usfirst.frc.team4159.robot.Robot;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -10,27 +11,42 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class AutoAim extends Command {
 
+    private static final int MAX_TIME = 3; // Max time in seconds
+    private static final int ROTATE_MULTIPLIER = 15;
+    private static final int LIFTER_MULTIPLIER = 10;
+
     private boolean readyToShoot = false;
     private boolean isShooting = false;
     private boolean hasShot = false;
+    private double targetLifterAngle = 0;
 
     private SetShooterAngle setShooterAngle;
     private Shoot shoot;
+
+    private Timer time;
 
     public AutoAim() {
         requires(Robot.drivetrain);
         setShooterAngle = new SetShooterAngle(Robot.lifter.getAngle());
         shoot = new Shoot();
+        time = new Timer();
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+        time.reset();
+        time.start();
         setShooterAngle.start();
         SmartDashboard.putBoolean("runningAutoAim", true);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+        if (time.get() > MAX_TIME) {
+            hasShot = true;
+            return;
+        }
+
         if (isShooting) {
             if (shoot.isRunning())
                 return;
@@ -41,20 +57,15 @@ public class AutoAim extends Command {
         double rotation = (SmartDashboard.getNumber("center.x") / SmartDashboard.getNumber("cameraWidth")) - 0.5;
         SmartDashboard.putNumber("rotation", rotation);
 
-        // if(Math.abs(rotation) < 0.1)
-        // rotation = Math.signum(rotation) * 0.1;
+        targetLifterAngle = Robot.lifter.getAngle()
+                + ((SmartDashboard.getNumber("center.x") / SmartDashboard.getNumber("cameraWidth")) - 0.5)
+                        * LIFTER_MULTIPLIER;
 
-        // if(setShooterAngle.getError() < 1) //TODO: Idk fix it or not i dont
-        // really care
+        Robot.drivetrain.set(rotation * -ROTATE_MULTIPLIER, rotation * ROTATE_MULTIPLIER);
 
-        // targetLifterAngle =
-        // ShooterLookup.getAngle(Robot.towerTracker.getDistance());
+        setShooterAngle.setAngle(targetLifterAngle);
 
-        Robot.drivetrain.set(rotation * -15, rotation * 15);
-
-        // setShooterAngle.setAngle(targetLifterAngle);
-
-        if (!(rotation > 0.04 || rotation < -0.04)) {
+        if (Math.abs(rotation) <= 0.04 && setShooterAngle.getError() < 1.5) {
             readyToShoot = true;
         }
 
@@ -71,6 +82,10 @@ public class AutoAim extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+        Robot.drivetrain.set(0, 0);
+        setShooterAngle.cancel();
+
+        time.stop();
         SmartDashboard.putBoolean("runningAutoAim", false);
     }
 
