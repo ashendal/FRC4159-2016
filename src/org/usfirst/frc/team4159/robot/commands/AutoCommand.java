@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 public class AutoCommand extends Command {
-    
+
     private Timer autoTime = new Timer();
-    
+
     private boolean isDone = false;
 
     public AutoCommand() {
@@ -23,14 +23,13 @@ public class AutoCommand extends Command {
     protected void initialize() {
         autoTime.reset();
         autoTime.start();
-        
+
         Robot.drivetrain.enable();
         Robot.drivetrain.setGear(Drivetrain.SpeedGear.HIGH);
     }
 
     protected void execute() {
-        if(autoTime.get() < 5)
-        {
+        if (autoTime.get() < 5) {
             Robot.drivetrain.set(8, 8);
         } else {
             Robot.drivetrain.set(0, 0);

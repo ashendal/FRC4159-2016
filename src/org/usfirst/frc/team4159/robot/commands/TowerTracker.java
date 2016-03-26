@@ -10,13 +10,13 @@ public class TowerTracker extends Command {
 
     private double distance;
     private double sideAngle;
-    
+
     private boolean isRunning;
-    
+
     public TowerTracker() {
         this.setRunWhenDisabled(true);
-        
-        // Set to false to allow for checking if RPi is up 
+
+        // Set to false to allow for checking if RPi is up
         SmartDashboard.putBoolean("RPiRunning", false);
         isRunning = false;
     }
@@ -27,12 +27,11 @@ public class TowerTracker extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        if(isRunning)
-        {
+        if (isRunning) {
             distance = SmartDashboard.getNumber("distance");
             sideAngle = SmartDashboard.getNumber("sideAngle");
         } else {
-            if(SmartDashboard.getBoolean("RPiRunning"))
+            if (SmartDashboard.getBoolean("RPiRunning"))
                 isRunning = true;
         }
     }
@@ -50,9 +49,8 @@ public class TowerTracker extends Command {
     // subsystems is scheduled to run
     protected void interrupted() {
     }
-    
-    public double getDistance()
-    {
+
+    public double getDistance() {
         return distance;
     }
 }

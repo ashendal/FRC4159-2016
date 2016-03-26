@@ -11,64 +11,55 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class Shooter extends Subsystem {
 
     private static int TARGET_SPEED = 5000;
-    
+
     private Victor topWheelMotor;
     private Victor bottomWheelMotor;
-    
+
     private Encoder topWheelEncoder;
     private Encoder bottomWheelEncoder;
-    
+
     private DoubleSolenoid triggerActuator;
-    
-    public Shooter()
-    {
+
+    public Shooter() {
         // Setup motors
         topWheelMotor = new Victor(RobotMap.topShooter);
         bottomWheelMotor = new Victor(RobotMap.bottomShooter);
-        
+
         // Setup encoders
         topWheelEncoder = new Encoder(RobotMap.topShooterEncoderA, RobotMap.topShooterEncoderB);
         bottomWheelEncoder = new Encoder(RobotMap.bottomShooterEncoderA, RobotMap.bottomShooterEncoderB);
-        
+
         // Setup solenoid
         triggerActuator = new DoubleSolenoid(RobotMap.shooterTriggerForwards, RobotMap.shooterTriggerReverse);
     }
-    
-    public boolean atTargetSpeed()
-    {
+
+    public boolean atTargetSpeed() {
         return getTopWheelSpeed() >= TARGET_SPEED && getBottomWheelSpeed() >= TARGET_SPEED;
     }
-    
-    public double getTopWheelSpeed()
-    {
+
+    public double getTopWheelSpeed() {
         return topWheelEncoder.getRate();
     }
-    
-    public double getBottomWheelSpeed()
-    {
+
+    public double getBottomWheelSpeed() {
         return bottomWheelEncoder.getRate();
     }
-    
-    public void setTopWheel(double value)
-    {
+
+    public void setTopWheel(double value) {
         topWheelMotor.set(value);
     }
-    
-    public void setBottomWheel(double value)
-    {
+
+    public void setBottomWheel(double value) {
         bottomWheelMotor.set(value);
     }
-    
-    public void setWheels(double leftValue, double rightValue)
-    {
+
+    public void setWheels(double leftValue, double rightValue) {
         topWheelMotor.set(leftValue);
         bottomWheelMotor.set(rightValue);
     }
-    
-    public void setTrigger(TriggerPosition pos)
-    {
-        switch(pos)
-        {
+
+    public void setTrigger(TriggerPosition pos) {
+        switch (pos) {
         case OPEN:
             triggerActuator.set(Value.kReverse);
             break;
@@ -77,11 +68,11 @@ public class Shooter extends Subsystem {
             break;
         }
     }
-    
+
     protected void initDefaultCommand() {
-        
+
     }
-    
+
     public enum TriggerPosition {
         OPEN, CLOSED
     }

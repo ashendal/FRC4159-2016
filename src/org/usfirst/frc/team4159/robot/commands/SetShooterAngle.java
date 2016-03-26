@@ -12,27 +12,25 @@ public class SetShooterAngle extends Command {
 
     private static double TOP_ANGLE = 75;
     private static double BOTTOM_ANGLE = -5;
-    
+
     private double kP;
-    
+
     private double setpoint;
-    
+
     private double error = 10000;
-    
+
     public SetShooterAngle(double s) {
         setpoint = s;
-        
+
         kP = SmartDashboard.getNumber("Lifter.lifterPID.kP");
         requires(Robot.lifter);
     }
-    
-    public void setP(double p)
-    {
+
+    public void setP(double p) {
         kP = p;
     }
-    
-    public void setAngle(double s)
-    {
+
+    public void setAngle(double s) {
         setpoint = s > TOP_ANGLE ? TOP_ANGLE : s < BOTTOM_ANGLE ? BOTTOM_ANGLE : s;
     }
 
@@ -46,9 +44,8 @@ public class SetShooterAngle extends Command {
         SmartDashboard.putNumber("lifterPID error", error);
         Robot.lifter.setRaw(error * kP);
     }
-    
-    public double getError()
-    {
+
+    public double getError() {
         return error;
     }
 
