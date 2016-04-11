@@ -3,6 +3,7 @@ package org.usfirst.frc.team4159.robot;
 
 import org.usfirst.frc.team4159.robot.commands.AutoAim;
 import org.usfirst.frc.team4159.robot.commands.AutoCommand;
+import org.usfirst.frc.team4159.robot.commands.Intake;
 import org.usfirst.frc.team4159.robot.commands.SetShooterAngle;
 import org.usfirst.frc.team4159.robot.commands.Shoot;
 import org.usfirst.frc.team4159.robot.commands.TowerTracker;
@@ -15,6 +16,8 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -41,13 +44,18 @@ public class Robot extends IterativeRobot {
     private Command shoot;
     private SetShooterAngle setLifterAngle;
     private AutoAim autoAim;
+    private Intake intake;
 
-    private AHRS ahrs;
+    public static AHRS ahrs;
+
+    private Relay flashlight;
 
     /**
      * Main robot initialization method
      */
     public void robotInit() {
+        flashlight = new Relay(0);
+
         setupSmartDashboard();
 
         oi = new OI();
@@ -61,13 +69,15 @@ public class Robot extends IterativeRobot {
 
         setLifterAngle = new SetShooterAngle(45);
         autoAim = new AutoAim();
+        intake = new Intake();
 
         chooser = new SendableChooser();
         chooser.addDefault("Low Bar", new AutoCommand(AutoCommand.Defense.LOW_BAR));
-        chooser.addDefault("Second", new AutoCommand(AutoCommand.Defense.SECOND));
-        chooser.addDefault("Third", new AutoCommand(AutoCommand.Defense.THIRD));
-        chooser.addDefault("Fourth", new AutoCommand(AutoCommand.Defense.FOURTH));
-        chooser.addDefault("Fifth", new AutoCommand(AutoCommand.Defense.FIFTH));
+        chooser.addObject("Second", new AutoCommand(AutoCommand.Defense.SECOND));
+        chooser.addObject("Third", new AutoCommand(AutoCommand.Defense.THIRD));
+        chooser.addObject("Fourth", new AutoCommand(AutoCommand.Defense.FOURTH));
+        chooser.addObject("Fifth", new AutoCommand(AutoCommand.Defense.FIFTH));
+        chooser.addObject("Spy", new AutoCommand(AutoCommand.Defense.SPY));
         SmartDashboard.putData("Auto mode", chooser);
 
         try {
@@ -82,15 +92,20 @@ public class Robot extends IterativeRobot {
 
         SmartDashboard.putNumber("Lifter.lifterPID.kP", 0.1);
 
-        SmartDashboard.putNumber("Drivetrain.leftPID.kP", 0.05);
+        SmartDashboard.putNumber("Drivetrain.leftPID.kP", 0.1);
         SmartDashboard.putNumber("Drivetrain.leftPID.kI", 0);
         SmartDashboard.putNumber("Drivetrain.leftPID.kD", 0);
-        SmartDashboard.putNumber("Drivetrain.leftPID.kF", 0);
+        SmartDashboard.putNumber("Drivetrain.leftPID.kF", 0); // TODO: Change to
+                                                              // real values
+                                                              // when pits open
+                                                              // thursday
 
-        SmartDashboard.putNumber("Drivetrain.rightPID.kP", 0.05);
+        SmartDashboard.putNumber("Drivetrain.rightPID.kP", 0.1);
         SmartDashboard.putNumber("Drivetrain.rightPID.kI", 0);
         SmartDashboard.putNumber("Drivetrain.rightPID.kD", 0);
         SmartDashboard.putNumber("Drivetrain.rightPID.kF", 0);
+
+        SmartDashboard.putNumber("Set angle", 48.5);
     }
 
     /**
@@ -121,6 +136,8 @@ public class Robot extends IterativeRobot {
      */
     public void autonomousInit() {
         autonomousCommand = (Command) chooser.getSelected();
+
+        flashlight.set(Value.kOff);
 
         // schedule the autonomous command
         if (autonomousCommand != null)
@@ -158,18 +175,39 @@ public class Robot extends IterativeRobot {
      * Get and act on operator input and run commands
      */
     public void teleopPeriodic() {
-        if (oi.secondaryStick.getTrigger() && !shoot.isRunning()) {
+        if (shoot.isRunning() || autoAim.isRunning() || intake.isRunning()) { // If
+                                                                              // stuff
+                                                                              // is
+                                                                              // running
+                                                                              // then
+                                                                              // don't
+                                                                              // interrupt
+
+        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SHOOT) && !shoot.isRunning()) {
             shoot = new Shoot();
             shoot.start();
-        } /*
-           * else if(oi.secondaryStick.getRawButton(4) && !autoAim.isRunning())
-           * { autoAim = new AutoAim(); autoAim.start(); }
-           */ else if (oi.secondaryStick.getRawButton(oi.SECONDARY_INTAKE))
-            shooter.setWheels(0.3, -0.3); // Intake
-        else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SPIT_OUT))
-            shooter.setWheels(-0.5, -0.5); // Spit out
-        else if (!shoot.isRunning())
+        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_AUTOAIM) && !autoAim.isRunning()) {
+            // autoAim = new AutoAim();
+            // autoAim.start();
+        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SPIT_OUT))
+            shooter.setWheels(-0.5, -0.5);
+        else if (oi.secondaryStick.getRawButton(oi.SECONDARY_INTAKE) && !intake.isRunning()) {
+            // intake = new Intake();
+            // intake.start();
+            shooter.setWheels(0.4, -0.4);
+        } else if (!shoot.isRunning())
             shooter.setWheels(0.0, 0.0);
+
+        // if(!oi.secondaryStick.getRawButton(oi.SECONDARY_INTAKE))
+        // intake.cancel();
+
+        SmartDashboard.putBoolean("switch", RobotMap.ballSwitch.get());
+
+        if (oi.secondaryStick.getRawButton(oi.SECONDARY_LIGHT)) {
+            flashlight.set(Value.kOn);
+        } else {
+            flashlight.set(Value.kOff);
+        }
 
         if (oi.secondaryStick.getRawButton(oi.SECONDARY_TRIGGER_OPEN))
             shooter.setTrigger(TriggerPosition.OPEN);
@@ -178,13 +216,17 @@ public class Robot extends IterativeRobot {
 
         drivetrain.set(oi.leftStick.getAxis(oi.LEFT_DRIVE_AXIS) * oi.LEFT_DRIVE_MULTIPLIER,
                 oi.rightStick.getAxis(oi.RIGHT_DRIVE_AXIS) * oi.RIGHT_DRIVE_MULTIPLIER);
+
         if (oi.rightStick.getRawButton(oi.RIGHT_SHIFT_HIGH))
             drivetrain.setGear(Drivetrain.SpeedGear.HIGH);
         if (oi.rightStick.getRawButton(oi.RIGHT_SHIFT_LOW))
             drivetrain.setGear(Drivetrain.SpeedGear.LOW);
 
-        setLifterAngle.setAngle(lifter.getAngle()
-                + (oi.secondaryStick.getAxis(oi.SECONDARY_LIFTER_AXIS) * oi.SECONDARY_LIFTER_MULTIPLIER));
+        if (oi.secondaryStick.getRawButton(oi.SECONDARY_SET)) {
+            setLifterAngle.setAngle(SmartDashboard.getNumber("Set angle"));
+        } else
+            setLifterAngle.setAngle(lifter.getAngle()
+                    + (oi.secondaryStick.getAxis(oi.SECONDARY_LIFTER_AXIS) * oi.SECONDARY_LIFTER_MULTIPLIER));
 
         SmartDashboard.putNumber("lifterAngle", lifter.getAngle());
 

@@ -15,8 +15,8 @@ public class Shooter extends Subsystem {
     private Victor topWheelMotor;
     private Victor bottomWheelMotor;
 
-    private Encoder topWheelEncoder;
-    private Encoder bottomWheelEncoder;
+    // private Encoder topWheelEncoder;
+    // private Encoder bottomWheelEncoder;
 
     private DoubleSolenoid triggerActuator;
 
@@ -26,24 +26,24 @@ public class Shooter extends Subsystem {
         bottomWheelMotor = new Victor(RobotMap.bottomShooter);
 
         // Setup encoders
-        topWheelEncoder = new Encoder(RobotMap.topShooterEncoderA, RobotMap.topShooterEncoderB);
-        bottomWheelEncoder = new Encoder(RobotMap.bottomShooterEncoderA, RobotMap.bottomShooterEncoderB);
+        // topWheelEncoder = new Encoder(RobotMap.topShooterEncoderA,
+        // RobotMap.topShooterEncoderB);
+        // bottomWheelEncoder = new Encoder(RobotMap.bottomShooterEncoderA,
+        // RobotMap.bottomShooterEncoderB);
 
         // Setup solenoid
         triggerActuator = new DoubleSolenoid(RobotMap.shooterTriggerForwards, RobotMap.shooterTriggerReverse);
     }
 
-    public boolean atTargetSpeed() {
-        return getTopWheelSpeed() >= TARGET_SPEED && getBottomWheelSpeed() >= TARGET_SPEED;
-    }
-
-    public double getTopWheelSpeed() {
-        return topWheelEncoder.getRate();
-    }
-
-    public double getBottomWheelSpeed() {
-        return bottomWheelEncoder.getRate();
-    }
+    /*
+     * public boolean atTargetSpeed() { return getTopWheelSpeed() >=
+     * TARGET_SPEED && getBottomWheelSpeed() >= TARGET_SPEED; }
+     * 
+     * public double getTopWheelSpeed() { return topWheelEncoder.getRate(); }
+     * 
+     * public double getBottomWheelSpeed() { return
+     * bottomWheelEncoder.getRate(); }
+     */
 
     public void setTopWheel(double value) {
         topWheelMotor.set(value);

@@ -45,6 +45,9 @@ public class Lifter extends Subsystem {
     public void initDefaultCommand() {
     }
 
+    double encoderYIntercept = 3165;
+    double encoderSlope = 9.052;
+
     /**
      * Get encoder value from given angle<br>
      * <br>
@@ -54,10 +57,8 @@ public class Lifter extends Subsystem {
      *            Degrees input
      * @return Encoder value output
      */
-    private double getValueFromAngle(double degrees) {
-        double magicA = 2896;
-        double magicB = 9.052;
-        return magicA + (9.052 * degrees);
+    public double getValueFromAngle(double degrees) {
+        return encoderYIntercept + (encoderSlope * degrees);
     }
 
     /**
@@ -69,8 +70,14 @@ public class Lifter extends Subsystem {
      *            Encoder value
      * @return Angle of lifter
      */
-    private double getAngleFromValue(double value) {
-        return (-316.3 + (0.1094 * value));
+    public double getAngleFromValue(double value) {
+        // double angle = ((1/encoderSlope)*encoderYIntercept +
+        // ((1/encoderSlope) * value));
+        double angle = (value - encoderYIntercept) / encoderSlope;
+        return angle;
+    }
 
+    public void zero() {
+        encoderYIntercept = lifterEncoder.getValue();
     }
 }

@@ -38,7 +38,7 @@ public class AutoAim extends Command {
         time.start();
         setShooterAngle.setAngle(Robot.lifter.getAngle());
         setShooterAngle.start();
-        SmartDashboard.putBoolean("runningAutoAim", true);
+        SmartDashboard.putBoolean("autoaim.running", true);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -55,12 +55,11 @@ public class AutoAim extends Command {
             return;
         }
 
-        double rotation = (SmartDashboard.getNumber("center.x") / SmartDashboard.getNumber("cameraWidth")) - 0.5;
-        SmartDashboard.putNumber("rotation", rotation);
+        double rotation = (Robot.towerTracker.getCenterX() / Robot.towerTracker.getCameraWidth()) - 0.5;
+        SmartDashboard.putNumber("Autoaim.rotation", rotation);
 
         targetLifterAngle = Robot.lifter.getAngle()
-                + ((SmartDashboard.getNumber("center.x") / SmartDashboard.getNumber("cameraWidth")) - 0.5)
-                        * LIFTER_MULTIPLIER;
+                + ((Robot.towerTracker.getCenterY() / Robot.towerTracker.getCameraHeight()) - 0.5) * LIFTER_MULTIPLIER;
 
         Robot.drivetrain.set(rotation * -ROTATE_MULTIPLIER, rotation * ROTATE_MULTIPLIER);
 
@@ -87,7 +86,7 @@ public class AutoAim extends Command {
         setShooterAngle.cancel();
 
         time.stop();
-        SmartDashboard.putBoolean("runningAutoAim", false);
+        SmartDashboard.putBoolean("autoaim.running", false);
     }
 
     // Called when another command which requires one or more of the same

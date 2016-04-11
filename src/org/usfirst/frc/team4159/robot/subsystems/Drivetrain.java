@@ -96,6 +96,8 @@ public class Drivetrain extends Subsystem {
      *            Right motor setpoint. In RPS (revolutions / sec)
      */
     public void set(double leftValue, double rightValue) {
+        leftValue = Math.abs(leftValue) <= 2 ? 0 : leftValue;
+        rightValue = Math.abs(rightValue) <= 2 ? 0 : rightValue;
         leftPID.setSetpoint(leftValue);
         rightPID.setSetpoint(rightValue);
     }
@@ -123,12 +125,12 @@ public class Drivetrain extends Subsystem {
         currentGear = gear;
         switch (gear) {
         case HIGH:
-            leftSolenoid.set(Value.kForward);
-            rightSolenoid.set(Value.kForward);
-            break;
-        case LOW:
             leftSolenoid.set(Value.kReverse);
             rightSolenoid.set(Value.kReverse);
+            break;
+        case LOW:
+            leftSolenoid.set(Value.kForward);
+            rightSolenoid.set(Value.kForward);
         }
     }
 

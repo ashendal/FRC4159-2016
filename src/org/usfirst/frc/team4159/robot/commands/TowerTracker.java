@@ -9,7 +9,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TowerTracker extends Command {
 
     private double distance;
-    private double sideAngle;
+    private double centerX;
+    private double centerY;
+    private double cameraWidth;
+    private double cameraHeight;
 
     private boolean isRunning;
 
@@ -28,8 +31,12 @@ public class TowerTracker extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
         if (isRunning) {
-            distance = SmartDashboard.getNumber("distance");
-            sideAngle = SmartDashboard.getNumber("sideAngle");
+            distance = SmartDashboard.getNumber("distance", -1);
+            centerX = SmartDashboard.getNumber("center.x", -1);
+            centerY = SmartDashboard.getNumber("center.x", -1);
+            cameraWidth = SmartDashboard.getNumber("cameraWidth", -1);
+            cameraHeight = SmartDashboard.getNumber("cameraHeight", -1);
+
         } else {
             if (SmartDashboard.getBoolean("RPiRunning"))
                 isRunning = true;
@@ -52,5 +59,21 @@ public class TowerTracker extends Command {
 
     public double getDistance() {
         return distance;
+    }
+
+    public double getCenterX() {
+        return centerX;
+    }
+
+    public double getCenterY() {
+        return centerY;
+    }
+
+    public double getCameraWidth() {
+        return cameraWidth;
+    }
+
+    public double getCameraHeight() {
+        return cameraHeight;
     }
 }

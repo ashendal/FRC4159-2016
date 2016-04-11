@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4159.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
  * to a variable name. This provides flexibility changing wiring, makes checking
@@ -41,4 +43,8 @@ public class RobotMap {
     // lifter PWM ports
     public static int dartActuator = 3;
     public static int dartEncoder = 0;
+
+    public static DigitalInput zeroSwitch = new DigitalInput(7);
+    public static DigitalInput topSwitch = new DigitalInput(8);
+    public static DigitalInput ballSwitch = new DigitalInput(9);
 }
