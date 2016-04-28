@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class SetShooterAngle extends Command {
 
-    private static double TOP_ANGLE = 75;
+    private static double TOP_ANGLE = 80;
     private static double BOTTOM_ANGLE = 0;
 
     private double kP;

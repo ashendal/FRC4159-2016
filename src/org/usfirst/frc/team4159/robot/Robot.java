@@ -13,7 +13,12 @@ import org.usfirst.frc.team4159.robot.subsystems.Shooter;
 import org.usfirst.frc.team4159.robot.subsystems.Shooter.TriggerPosition;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.Image;
+import com.ni.vision.NIVision.ImageType;
+import com.ni.vision.NIVision.Overlay;
 
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Relay;
@@ -24,6 +29,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.vision.USBCamera;
 
 /**
  * Main robot class
@@ -57,6 +63,8 @@ public class Robot extends IterativeRobot {
         flashlight = new Relay(0);
 
         setupSmartDashboard();
+        
+        sendFeed();
 
         oi = new OI();
 
@@ -88,11 +96,11 @@ public class Robot extends IterativeRobot {
     }
 
     private void setupSmartDashboard() {
-        SmartDashboard.putNumber("lifterSetpoint", 30);
+        SmartDashboard.putNumber("lifterSetpoint", 0);
 
         SmartDashboard.putNumber("Lifter.lifterPID.kP", 0.1);
 
-        SmartDashboard.putNumber("Drivetrain.leftPID.kP", 0.1);
+        SmartDashboard.putNumber("Drivetrain.leftPID.kP", 0.2);
         SmartDashboard.putNumber("Drivetrain.leftPID.kI", 0);
         SmartDashboard.putNumber("Drivetrain.leftPID.kD", 0);
         SmartDashboard.putNumber("Drivetrain.leftPID.kF", 0); // TODO: Change to
@@ -100,7 +108,7 @@ public class Robot extends IterativeRobot {
                                                               // when pits open
                                                               // thursday
 
-        SmartDashboard.putNumber("Drivetrain.rightPID.kP", 0.1);
+        SmartDashboard.putNumber("Drivetrain.rightPID.kP", 0.2);
         SmartDashboard.putNumber("Drivetrain.rightPID.kI", 0);
         SmartDashboard.putNumber("Drivetrain.rightPID.kD", 0);
         SmartDashboard.putNumber("Drivetrain.rightPID.kF", 0);
@@ -126,6 +134,7 @@ public class Robot extends IterativeRobot {
      * Nothing should run here...
      */
     public void disabledPeriodic() {
+        sendFeed();
         Scheduler.getInstance().run();
     }
 
@@ -148,6 +157,7 @@ public class Robot extends IterativeRobot {
      * Autonomous periodic method
      */
     public void autonomousPeriodic() {
+        sendFeed();
         Scheduler.getInstance().run();
     }
 
@@ -175,6 +185,7 @@ public class Robot extends IterativeRobot {
      * Get and act on operator input and run commands
      */
     public void teleopPeriodic() {
+        sendFeed();
         if (shoot.isRunning() || autoAim.isRunning() || intake.isRunning()) { // If
                                                                               // stuff
                                                                               // is
@@ -183,7 +194,7 @@ public class Robot extends IterativeRobot {
                                                                               // don't
                                                                               // interrupt
 
-        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SHOOT) && !shoot.isRunning()) {
+        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SHOOT)/* && oi.rightStick.getRawButton(oi.SECONDARY_SHOOT)*/ && !shoot.isRunning()) {
             shoot = new Shoot();
             shoot.start();
         } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_AUTOAIM) && !autoAim.isRunning()) {
@@ -249,5 +260,19 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
         LiveWindow.run();
+    }
+    
+    USBCamera usbCam = new USBCamera("cam0");
+    CameraServer cs = CameraServer.getInstance();
+    private void sendFeed() {
+        /*usbCam.openCamera();
+        Image img = NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 100);
+        NIVision.imaqSetImageSize(img, 640, 480);
+        usbCam.getImage(img);
+        //NIVision.imaqOverlayLine(image, start, end, color, group);
+        cs.setImage(img);
+        usbCam.closeCamera();*/
+        
+        cs.startAutomaticCapture(usbCam);
     }
 }

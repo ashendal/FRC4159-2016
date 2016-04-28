@@ -19,6 +19,8 @@ public class Shoot extends Command {
     private boolean phase1 = false;
     private boolean phase2 = false;
     private boolean phase3 = false;
+    
+    private double shootSpeed = 0.75;
 
     private Timer time;
 
@@ -53,7 +55,7 @@ public class Shoot extends Command {
             }
         } else if (phase2) {
             SmartDashboard.putString("Status", "Shooting... phase2");
-            Robot.shooter.setWheels(0.75, 0.75);
+            Robot.shooter.setWheels(shootSpeed, shootSpeed);
             if (time.get() > phase2Time) {
                 phase2 = false;
                 phase3 = true;
