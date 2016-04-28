@@ -44,6 +44,7 @@ public class RobotMap {
     public static int dartActuator = 3;
     public static int dartEncoder = 0;
 
+    // limit switches
     public static DigitalInput zeroSwitch = new DigitalInput(7);
     public static DigitalInput topSwitch = new DigitalInput(8);
     public static DigitalInput ballSwitch = new DigitalInput(9);
