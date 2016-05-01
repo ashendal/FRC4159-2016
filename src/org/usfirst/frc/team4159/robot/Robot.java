@@ -49,10 +49,7 @@ public class Robot extends IterativeRobot {
 
     public static TowerTracker towerTracker;
 
-    private Command shoot;
     private SetShooterAngle setLifterAngle;
-    private AutoAim autoAim;
-    private Intake intake;
 
     public static AHRS ahrs;
 
@@ -78,8 +75,6 @@ public class Robot extends IterativeRobot {
         towerTracker.start();
 
         setLifterAngle = new SetShooterAngle(45);
-        autoAim = new AutoAim();
-        intake = new Intake();
 
         chooser = new SendableChooser();
         chooser.addDefault("Passive", new AutoCommand(AutoCommand.Defense.PASSIVE));
@@ -171,9 +166,6 @@ public class Robot extends IterativeRobot {
             autonomousCommand.cancel();
         drivetrain.enable();
 
-        shoot = null;
-        shoot = new Shoot();
-
         setLifterAngle.setP(SmartDashboard.getNumber("Lifter.lifterPID.kP"));
         setLifterAngle.start();
     }
@@ -188,27 +180,11 @@ public class Robot extends IterativeRobot {
      */
     public void teleopPeriodic() {
         sendFeed();
-        if (shoot.isRunning() || autoAim.isRunning() || intake.isRunning()) { // If
-                                                                              // stuff
-                                                                              // is
-                                                                              // running
-                                                                              // then
-                                                                              // don't
-                                                                              // interrupt
-        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SHOOT)
-                /* && oi.rightStick.getRawButton(oi.SECONDARY_SHOOT) */ && !shoot.isRunning()) {
-            shoot = new Shoot();
-            shoot.start();
-        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_AUTOAIM) && !autoAim.isRunning()) {
-            // autoAim = new AutoAim();
-            // autoAim.start();
-        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SPIT_OUT))
+        if (oi.secondaryStick.getRawButton(oi.SECONDARY_SPIT_OUT))
             shooter.setWheels(-0.5, -0.5);
-        else if (oi.secondaryStick.getRawButton(oi.SECONDARY_INTAKE) && !intake.isRunning()) {
-            // intake = new Intake();
-            // intake.start();
+        else if (oi.secondaryStick.getRawButton(oi.SECONDARY_INTAKE)) {
             shooter.setWheels(0.3, -0.3);
-        } else if (!shoot.isRunning())
+        } else
             shooter.setWheels(0.0, 0.0);
 
         if (stabbyUpperLimit.get() && oi.leftStick.getRawButton(3))
