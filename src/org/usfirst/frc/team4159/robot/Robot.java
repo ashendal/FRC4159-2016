@@ -19,11 +19,13 @@ import com.ni.vision.NIVision.ImageType;
 import com.ni.vision.NIVision.Overlay;
 
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -63,7 +65,7 @@ public class Robot extends IterativeRobot {
         flashlight = new Relay(0);
 
         setupSmartDashboard();
-        
+
         sendFeed();
 
         oi = new OI();
@@ -80,11 +82,8 @@ public class Robot extends IterativeRobot {
         intake = new Intake();
 
         chooser = new SendableChooser();
-        chooser.addDefault("Low Bar", new AutoCommand(AutoCommand.Defense.LOW_BAR));
-        chooser.addObject("Second", new AutoCommand(AutoCommand.Defense.SECOND));
-        chooser.addObject("Third", new AutoCommand(AutoCommand.Defense.THIRD));
-        chooser.addObject("Fourth", new AutoCommand(AutoCommand.Defense.FOURTH));
-        chooser.addObject("Fifth", new AutoCommand(AutoCommand.Defense.FIFTH));
+        chooser.addDefault("Passive", new AutoCommand(AutoCommand.Defense.PASSIVE));
+        chooser.addObject("Low Bar", new AutoCommand(AutoCommand.Defense.LOW_BAR));
         chooser.addObject("Spy", new AutoCommand(AutoCommand.Defense.SPY));
         SmartDashboard.putData("Auto mode", chooser);
 
@@ -179,6 +178,9 @@ public class Robot extends IterativeRobot {
         setLifterAngle.start();
     }
 
+    public static Victor stabbyStabby = new Victor(7);
+    public static DigitalInput stabbyUpperLimit = new DigitalInput(6);
+
     /**
      * Teleop periodic method
      * 
@@ -193,8 +195,8 @@ public class Robot extends IterativeRobot {
                                                                               // then
                                                                               // don't
                                                                               // interrupt
-
-        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SHOOT)/* && oi.rightStick.getRawButton(oi.SECONDARY_SHOOT)*/ && !shoot.isRunning()) {
+        } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SHOOT)
+                /* && oi.rightStick.getRawButton(oi.SECONDARY_SHOOT) */ && !shoot.isRunning()) {
             shoot = new Shoot();
             shoot.start();
         } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_AUTOAIM) && !autoAim.isRunning()) {
@@ -205,9 +207,16 @@ public class Robot extends IterativeRobot {
         else if (oi.secondaryStick.getRawButton(oi.SECONDARY_INTAKE) && !intake.isRunning()) {
             // intake = new Intake();
             // intake.start();
-            shooter.setWheels(0.4, -0.4);
+            shooter.setWheels(0.3, -0.3);
         } else if (!shoot.isRunning())
             shooter.setWheels(0.0, 0.0);
+
+        if (stabbyUpperLimit.get() && oi.leftStick.getRawButton(3))
+            stabbyStabby.set(0.75);
+        else if (oi.leftStick.getRawButton(2))
+            stabbyStabby.set(-0.75);
+        else
+            stabbyStabby.set(0);
 
         // if(!oi.secondaryStick.getRawButton(oi.SECONDARY_INTAKE))
         // intake.cancel();
@@ -233,11 +242,19 @@ public class Robot extends IterativeRobot {
         if (oi.rightStick.getRawButton(oi.RIGHT_SHIFT_LOW))
             drivetrain.setGear(Drivetrain.SpeedGear.LOW);
 
-        if (oi.secondaryStick.getRawButton(oi.SECONDARY_SET)) {
-            setLifterAngle.setAngle(SmartDashboard.getNumber("Set angle"));
-        } else
-            setLifterAngle.setAngle(lifter.getAngle()
-                    + (oi.secondaryStick.getAxis(oi.SECONDARY_LIFTER_AXIS) * oi.SECONDARY_LIFTER_MULTIPLIER));
+        if (oi.secondaryStick.getRawButton(11)) {
+            setLifterAngle.cancel();
+            Robot.lifter.setRaw(oi.secondaryStick.getY());
+        } else {
+            setLifterAngle.start();
+            if (oi.leftStick.getRawButton(1)) {
+                setLifterAngle.setAngle(7.78);
+            } else if (oi.secondaryStick.getRawButton(oi.SECONDARY_SET)) {
+                setLifterAngle.setAngle(SmartDashboard.getNumber("Set angle"));
+            } else
+                setLifterAngle.setAngle(lifter.getAngle()
+                        + (oi.secondaryStick.getAxis(oi.SECONDARY_LIFTER_AXIS) * oi.SECONDARY_LIFTER_MULTIPLIER));
+        }
 
         SmartDashboard.putNumber("lifterAngle", lifter.getAngle());
 
@@ -250,7 +267,8 @@ public class Robot extends IterativeRobot {
      * Setup subsystems and SmartDashboard for testing
      */
     public void testInit() {
-
+        setLifterAngle.setP(SmartDashboard.getNumber("Lifter.lifterPID.kP"));
+        setLifterAngle.start();
     }
 
     /**
@@ -260,19 +278,28 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
         LiveWindow.run();
+
+        drivetrain.setGear(Drivetrain.SpeedGear.LOW);
+
+        setLifterAngle.setAngle(62.417);
+        if (stabbyUpperLimit.get())
+            stabbyStabby.set(0.5);
+        else
+            stabbyStabby.set(0);
     }
-    
+
     USBCamera usbCam = new USBCamera("cam0");
     CameraServer cs = CameraServer.getInstance();
+
     private void sendFeed() {
-        /*usbCam.openCamera();
-        Image img = NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 100);
-        NIVision.imaqSetImageSize(img, 640, 480);
-        usbCam.getImage(img);
-        //NIVision.imaqOverlayLine(image, start, end, color, group);
-        cs.setImage(img);
-        usbCam.closeCamera();*/
-        
+        /*
+         * usbCam.openCamera(); Image img =
+         * NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 100);
+         * NIVision.imaqSetImageSize(img, 640, 480); usbCam.getImage(img);
+         * //NIVision.imaqOverlayLine(image, start, end, color, group);
+         * cs.setImage(img); usbCam.closeCamera();
+         */
+
         cs.startAutomaticCapture(usbCam);
     }
 }

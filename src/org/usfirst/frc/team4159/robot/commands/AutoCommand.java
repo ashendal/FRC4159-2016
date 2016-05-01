@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class AutoCommand extends Command {
 
-    private static final double DRIVE_SPEED = 8.0;
+    private static final double DRIVE_SPEED = 6.0;
+    private static final double STRAIGHT_DRIVE_COEFF = 2.0 / 90.0;
 
     private Timer autoTime = new Timer();
     private Defense defense;
@@ -22,15 +23,23 @@ public class AutoCommand extends Command {
     private double shooterSetpoint;
     private double startStage;
     private double driveStage;
+    private double backStage;
+    private double stabbyStage;
 
     private boolean inSetup = false;
     private boolean inDrive = false;
+    private boolean inSpit = false;
+    private boolean inBack = false;
 
+    private Timer stabbyTime = new Timer();
     private Timer driveTime = new Timer();
+    private Timer backTime = new Timer();
 
     private SetShooterAngle setShooterAngle;
 
     private double startAhrsAngle;
+
+    Spit spitCommand;
 
     public AutoCommand(Defense d) {
         this();
@@ -39,7 +48,6 @@ public class AutoCommand extends Command {
 
     public AutoCommand() {
         requires(Robot.drivetrain);
-        requires(Robot.shooter);
     }
 
     protected void initialize() {
@@ -47,44 +55,27 @@ public class AutoCommand extends Command {
 
         setShooterAngle = new SetShooterAngle(Robot.lifter.getAngle());
 
-        driveTime.reset();
-
-        autoTime.reset();
-        autoTime.start();
-
         switch (defense) {
         case LOW_BAR:
-            shooterSetpoint = 0;
-            startStage = 3;
-            driveStage = 5;
+            shooterSetpoint = 8.3;
+            startStage = 5;
+            driveStage = 3.5;
+            stabbyStage = 1;
             break;
-        case SECOND:
+        case PASSIVE:
             shooterSetpoint = 45;
             startStage = 3;
-            driveStage = 5;
-            break;
-        case THIRD:
-            shooterSetpoint = 45;
-            startStage = 3;
-            driveStage = 5;
-            break;
-        case FOURTH:
-            shooterSetpoint = 45;
-            startStage = 3;
-            driveStage = 5;
-            break;
-        case FIFTH:
-            shooterSetpoint = 45;
-            startStage = 3;
-            driveStage = 5;
+            driveStage = 3.5;
             break;
         case SPY:
             this.cancel();
             break;
         }
 
+        backStage = driveStage;
+
         Robot.drivetrain.enable();
-        Robot.drivetrain.setGear(Drivetrain.SpeedGear.HIGH);
+        Robot.drivetrain.setGear(Drivetrain.SpeedGear.LOW);
 
         setShooterAngle.start();
         setShooterAngle.setAngle(Robot.lifter.getAngle());
@@ -95,18 +86,53 @@ public class AutoCommand extends Command {
 
         startAhrsAngle = Robot.ahrs.getYaw();
 
+        isDone = false;
+        inDrive = false;
+        inSpit = false;
+        inBack = false;
         inSetup = true;
+
+        autoTime.reset();
+        driveTime.reset();
+        backTime.reset();
+        stabbyTime.reset();
+
+        autoTime.start();
     }
+
+    private boolean stabbyGoneUp = false;
 
     protected void execute() {
         setShooterAngle.setAngle(shooterSetpoint);
 
         if (inSetup) {
             SmartDashboard.putString("Status", "Auto setup");
-            if (setShooterAngle.getError() < 1.5 && autoTime.get() > startStage) {
-                inSetup = false;
-                inDrive = true;
-                driveTime.start();
+            if (defense == Defense.LOW_BAR) {
+                if (!stabbyGoneUp) {
+                    Robot.stabbyStabby.set(0.5);
+                    stabbyGoneUp = !Robot.stabbyUpperLimit.get();
+                    if (stabbyGoneUp) {
+                        stabbyTime.start();
+                    }
+                }
+
+                if (stabbyTime.get() <= stabbyStage)
+                    Robot.stabbyStabby.set(-0.75);
+                else
+                    Robot.stabbyStabby.set(0);
+
+                if (setShooterAngle.getError() < 5 && autoTime.get() > startStage && stabbyTime.get() > stabbyStage) {
+                    inSetup = false;
+                    inDrive = true;
+                    driveTime.start();
+                } else {
+                    if (setShooterAngle.getError() < 5 && autoTime.get() > startStage) {
+                        autoTime.stop();
+                        inSetup = false;
+                        inDrive = true;
+                        driveTime.start();
+                    }
+                }
             }
         } else if (inDrive) { // If ready
             SmartDashboard.putString("Status", "Auto drive");
@@ -115,15 +141,50 @@ public class AutoCommand extends Command {
 
                 SmartDashboard.putNumber("auto_error", errorAngle);
 
-                // Robot.drivetrain.set(Math.pow(driveSpeed, errorAngle),
-                // Math.pow(driveSpeed, -1 * errorAngle));
-                // Fuck that and drive 100%
-                Robot.drivetrain.set(DRIVE_SPEED, DRIVE_SPEED);
+                Robot.drivetrain.set(DRIVE_SPEED + errorAngle * STRAIGHT_DRIVE_COEFF,
+                        DRIVE_SPEED - errorAngle * STRAIGHT_DRIVE_COEFF);
+                SmartDashboard.putNumber("leftSpeed", DRIVE_SPEED + errorAngle * STRAIGHT_DRIVE_COEFF);
+                SmartDashboard.putNumber("rightSpeed", DRIVE_SPEED - errorAngle * STRAIGHT_DRIVE_COEFF);
+                // Robot.drivetrain.set(DRIVE_SPEED, DRIVE_SPEED);
             } else {
                 Robot.drivetrain.set(0, 0);
+                inDrive = false;
+                driveTime.stop();
+
+                // isDone = true;
+
+                inSpit = true;
+                spitCommand = new Spit();
+                spitCommand.start();
+            }
+        } else if (inSpit) {
+            SmartDashboard.putString("Status", "Auto spit");
+            SmartDashboard.putBoolean("spit running", spitCommand.isRunning());
+            if (!spitCommand.isRunning()) {
+                inSpit = false;
+                inBack = true;
+                backTime.start();
+            }
+        } else if (inBack) {
+            SmartDashboard.putString("Status", "Auto drive back");
+            if (backTime.get() < backStage) {
+                double errorAngle = Robot.ahrs.getYaw() - startAhrsAngle;
+
+                SmartDashboard.putNumber("auto_error", errorAngle);
+
+                Robot.drivetrain.set(-1 * (DRIVE_SPEED - errorAngle * STRAIGHT_DRIVE_COEFF),
+                        -1 * (DRIVE_SPEED + errorAngle * STRAIGHT_DRIVE_COEFF));
+                SmartDashboard.putNumber("leftSpeed", -1 * (DRIVE_SPEED - errorAngle * STRAIGHT_DRIVE_COEFF));
+                SmartDashboard.putNumber("rightSpeed", -1 * (DRIVE_SPEED + errorAngle * STRAIGHT_DRIVE_COEFF));
+                // Robot.drivetrain.set(-DRIVE_SPEED, -DRIVE_SPEED);
+            } else {
+                Robot.drivetrain.set(0, 0);
+                inBack = false;
                 isDone = true;
+                backTime.stop();
             }
         }
+
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -145,6 +206,6 @@ public class AutoCommand extends Command {
     }
 
     public enum Defense {
-        LOW_BAR, SECOND, THIRD, FOURTH, FIFTH, SPY
+        LOW_BAR, PASSIVE, SPY
     }
 }

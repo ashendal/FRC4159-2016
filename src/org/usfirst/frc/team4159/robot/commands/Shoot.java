@@ -19,8 +19,8 @@ public class Shoot extends Command {
     private boolean phase1 = false;
     private boolean phase2 = false;
     private boolean phase3 = false;
-    
-    private double shootSpeed = 0.75;
+
+    protected double shootSpeed = 0.75;
 
     private Timer time;
 
